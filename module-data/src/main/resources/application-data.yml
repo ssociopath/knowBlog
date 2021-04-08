@@ -1,14 +1,17 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/knowBlog
+    url: jdbc:mysql://localhost:3306/KnowBlog
     username: bobo
     password: liyanjia
   jpa:
     hibernate:
       ddl-auto: update
     database: mysql
-
+  redis:
+    host: localhost
+    port: 6379
+    database: 1
 
 
 

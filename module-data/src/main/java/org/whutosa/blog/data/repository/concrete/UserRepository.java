@@ -9,7 +9,7 @@ import org.whutosa.blog.data.repository.DataRepository;
  * @date 2021/3/31
  */
 
-public interface UserRepository extends DataRepository<User, String> {
+public interface UserRepository extends DataRepository<User, Integer> {
     /**
      * 通过帐号和密码查找用户是否存在
      * @param account 帐号

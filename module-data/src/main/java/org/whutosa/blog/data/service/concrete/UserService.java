@@ -18,7 +18,7 @@ import javax.annotation.Resource;
  */
 @Service
 @Slf4j
-public class UserService extends BaseDataService<User, String> {
+public class UserService extends BaseDataService<User, Integer> {
     @Resource
     UserRepository userRepository;
 

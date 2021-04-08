@@ -30,6 +30,8 @@ public class User {
     private String password;
     @NotNull(groups = {UserEditValidGroup.class})
     private String username;
+    @NotNull(groups = {UserEditValidGroup.class})
+    private Integer roleId;
     private Timestamp dateRegister;
 
     public User(String account, String password, String username, String dateRegister) {
