@@ -45,6 +45,9 @@ public class GlobalExceptionHandler {
         } else if (exception instanceof HttpRequestMethodNotSupportedException) {
             log.debug("捕获调用方法错误", exception);
             return ApplicationResponse.fail(REQUEST_METHOD_NOT_SUPPPORTED);
+        } else if (exception instanceof ShiroException){
+            log.debug("捕获权限错误", exception);
+            return ApplicationResponse.fail(NO_PERMISSION);
         }
         log.error("捕获意外异常", exception);
         return ApplicationResponse.fail(UNKNOWN_ERROR);

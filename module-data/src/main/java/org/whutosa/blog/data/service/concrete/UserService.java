@@ -22,10 +22,15 @@ public class UserService extends BaseDataService<User, Integer> {
     @Resource
     UserRepository userRepository;
 
-    public void addUser(User user){
+    public User addUser(User user){
         AssertUtils.isNull(userRepository.findUserByAccount(user.getAccount()), new ApplicationException(SystemCodeEnum.ARGUMENT_WRONG, "帐号已存在！"));
         user.setPassword(DigestUtils.sha1Hex(user.getPassword()));
-        this.insert(user);
+        return this.insert(user);
+    }
+
+    public User getUserByAccount(String account){
+        AssertUtils.notNull(account, new ApplicationException(SystemCodeEnum.ARGUMENT_WRONG, "帐号已存在！"));
+        return userRepository.findUserByAccount(account);
     }
 
     public boolean match(User user){

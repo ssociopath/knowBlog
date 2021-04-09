@@ -6,16 +6,13 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.codec.Base64;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.whutosa.blog.common.exception.ApplicationException;
 import org.whutosa.blog.common.response.SystemCodeEnum;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -26,16 +23,8 @@ import java.util.Date;
 @Component
 @Slf4j
 public class JwtUtil {
-
-    /**
-     * accessToken过期时间
-     */
-    private static final String ACCESS_TOKEN_EXPIRE_TIME = "300";
-
-    /**
-     * JWT认证加密私钥(Base64加密)
-     */
-    private static final String ENCRYPT_JWT_KEY = "U0JBUElKV1RkV2FuZzkyNjQ1NA==";
+    public static final String ACCOUNT = "account";
+    public static final String CURRENT_TIME_MILLIS = "currentTimeMillis";
 
     /**
      * 校验token是否正确
@@ -45,14 +34,13 @@ public class JwtUtil {
     public static boolean verify(String token) {
         try {
             // 帐号加JWT私钥解密
-            String secret = getClaim(token, "account")
-                    + new String(Base64.decode(ENCRYPT_JWT_KEY));
+            String secret = getClaim(token, ACCOUNT)
+                    + new String(Base64.decode(Constant.ENCRYPT_JWT_KEY));
             Algorithm algorithm = Algorithm.HMAC256(secret);
             JWTVerifier verifier = JWT.require(algorithm).build();
             verifier.verify(token);
             return true;
         } catch (Exception e) {
-            log.error("JWTToken认证解密出现异常:{}", e.getMessage());
             throw new AuthenticationException(e);
         }
     }
@@ -65,14 +53,15 @@ public class JwtUtil {
     public static String sign(String account, String currentTimeMillis){
         try {
             // 帐号加JWT私钥加密
-            String secret = account + new String(Base64.decode(ENCRYPT_JWT_KEY));
+            String secret = account + new String(Base64.decode(Constant.ENCRYPT_JWT_KEY));
             // 此处过期时间是以毫秒为单位，所以乘以1000
-            Date date = new Date(System.currentTimeMillis() + Long.parseLong(ACCESS_TOKEN_EXPIRE_TIME) * 1000);
+            Date date = new Date(System.currentTimeMillis()
+                    + Long.parseLong(Constant.ACCESS_TOKEN_EXPIRE_TIME) * 1000);
             Algorithm algorithm = Algorithm.HMAC256(secret);
             // 附带account帐号信息
             return JWT.create()
-                    .withClaim("account", account)
-                    .withClaim("currentTimeMillis", currentTimeMillis)
+                    .withClaim(ACCOUNT, account)
+                    .withClaim(CURRENT_TIME_MILLIS, currentTimeMillis)
                     .withExpiresAt(date)
                     .sign(algorithm);
         } catch (UnsupportedEncodingException e) {
