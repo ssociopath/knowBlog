@@ -1,5 +1,6 @@
 package org.whutosa.blog.api.config.shiro;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -86,9 +87,7 @@ public class UserRealm extends AuthorizingRealm {
         if (user == null) {
             throw new AuthenticationException("该帐号不存在(The account does not exist.)");
         }
-        if(JwtUtil.verify(token)){
-            return new SimpleAuthenticationInfo(token, token, "userRealm");
-        }
-        throw new AuthenticationException("Token已过期(Token expired or incorrect.)");
+        JwtUtil.verify(token);
+        return new SimpleAuthenticationInfo(token, token, "userRealm");
     }
 }

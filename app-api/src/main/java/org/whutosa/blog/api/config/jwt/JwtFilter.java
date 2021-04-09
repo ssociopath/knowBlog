@@ -1,8 +1,10 @@
 package org.whutosa.blog.api.config.jwt;
 
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
-import org.whutosa.blog.common.exception.ApplicationException;
 import org.whutosa.blog.common.response.SystemCodeEnum;
 
 import javax.servlet.ServletRequest;
@@ -16,6 +18,7 @@ import javax.servlet.ServletResponse;
 @Slf4j
 public class JwtFilter extends BasicHttpAuthenticationFilter {
 
+
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
         // 查看当前Header中是否携带Authorization属性(Token)，有的话就进行登录认证授权
@@ -23,34 +26,27 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
             try {
                 executeLogin(request, response);
             } catch (Exception e) {
-                // 认证出现异常，传递错误信息msg
+                SystemCodeEnum code = SystemCodeEnum.NEED_LOGIN;;
+                Throwable throwable = e.getCause();
                 String msg = e.getMessage();
-                log.info(msg);
-//                // 获取应用异常(该Cause是导致抛出此throwable(异常)的throwable(异常))
-//                Throwable throwable = e.getCause();
-//                if (throwable instanceof SignatureVerificationException) {
-//                    // 该异常为JWT的AccessToken认证失败(Token或者密钥不正确)
-//                    msg = "Token或者密钥不正确(" + throwable.getMessage() + ")";
-//                } else if (throwable instanceof TokenExpiredException) {
-//                    // 该异常为JWT的AccessToken已过期，判断RefreshToken未过期就进行AccessToken刷新
-//                    if (this.refreshToken(request, response)) {
-//                        return true;
-//                    } else {
-//                        msg = "Token已过期(" + throwable.getMessage() + ")";
-//                    }
-//                } else {
-//                    // 应用异常不为空
-//                    if (throwable != null) {
-//                        // 获取应用异常msg
-//                        msg = throwable.getMessage();
-//                    }
-//                }
-//                // Token认证失败直接返回Response信息
-//                this.response401(response, msg);
+                // 获取应用异常(该Cause是导致抛出此throwable(异常)的throwable(异常))
+                if (throwable instanceof SignatureVerificationException) {
+                    // 该异常为JWT的AccessToken认证失败(Token或者密钥不正确)
+                    msg = "Token或者密钥不正确(" + throwable.getMessage() + ")";
+                } else if (throwable instanceof TokenExpiredException) {
+                    msg = "Token已过期(" + throwable.getMessage() + ")";
+                } else if (throwable != null) {
+                    // 获取应用异常msg
+                    msg = throwable.getMessage();
+                    code = SystemCodeEnum.SERVER_INNER_ERROR;
+                }
+                sendError(request, response, msg, code.toString());
                 return false;
             }
         } else {
-            throw new ApplicationException(SystemCodeEnum.NEED_LOGIN);
+            sendError(request, response, "当前请求Authorization属性(Token)为空",
+                    SystemCodeEnum.NEED_LOGIN.toString());
+            return false;
         }
         return true;
     }
@@ -81,4 +77,14 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
         getSubject(request, response).login(token);
         return true;
     }
+
+    @SneakyThrows
+    private void sendError(ServletRequest request, ServletResponse response, String msg, String code){
+        log.info(msg);
+        request.setAttribute("filter.error.msg", msg);
+        request.setAttribute("filter.error.code", code);
+        request.getRequestDispatcher("/error/throw").forward(request, response);
+    }
+
+
 }

@@ -7,6 +7,7 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.codec.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -50,10 +51,9 @@ public class JwtUtil {
             JWTVerifier verifier = JWT.require(algorithm).build();
             verifier.verify(token);
             return true;
-        } catch (UnsupportedEncodingException e) {
-            log.error("JWTToken认证解密出现UnsupportedEncodingException异常:{}", e.getMessage());
-            throw new ApplicationException(SystemCodeEnum.SERVER_INNER_ERROR,
-                    "JWTToken认证解密出现UnsupportedEncodingException异常:" + e.getMessage());
+        } catch (Exception e) {
+            log.error("JWTToken认证解密出现异常:{}", e.getMessage());
+            throw new AuthenticationException(e);
         }
     }
 
@@ -62,7 +62,7 @@ public class JwtUtil {
      * @param account 帐号
      * @return java.lang.String 返回加密的Token
      */
-    public static String sign(String account, String currentTimeMillis) {
+    public static String sign(String account, String currentTimeMillis){
         try {
             // 帐号加JWT私钥加密
             String secret = account + new String(Base64.decode(ENCRYPT_JWT_KEY));

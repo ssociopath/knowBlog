@@ -46,7 +46,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ApplicationResponse<String> login(@Validated(UserLoginValidGroup.class) User user, HttpServletResponse httpServletResponse) {
+    public ApplicationResponse<String> login(@Validated(UserLoginValidGroup.class) User user, HttpServletResponse httpServletResponse) throws Exception {
         if(!userService.match(user)){
             return ApplicationResponse.fail(SystemCodeEnum.NEED_LOGIN, "帐号不存在或密码错误！");
         }
