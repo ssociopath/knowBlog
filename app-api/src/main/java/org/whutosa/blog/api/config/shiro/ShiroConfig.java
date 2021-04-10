@@ -2,7 +2,6 @@ package org.whutosa.blog.api.config.shiro;
 
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
-import org.apache.shiro.realm.Realm;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -11,11 +10,8 @@ import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreato
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.whutosa.blog.api.config.jwt.JwtFilter;
 
-import javax.annotation.Resource;
 import javax.servlet.Filter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -29,16 +25,13 @@ import java.util.Map;
 
 @Configuration
 public class ShiroConfig {
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
-
     @Bean("shiroFilter")
     public ShiroFilterFactoryBean shiroFilterFactoryBean(DefaultWebSecurityManager securityManager) {
         ShiroFilterFactoryBean factoryBean = new ShiroFilterFactoryBean();
         factoryBean.setSecurityManager(securityManager);
 //        设置过滤器为自定义的jwt过滤器并取名jwt
         Map<String, Filter> filterMap = new HashMap<>(16);
-        filterMap.put("jwt", new JwtFilter(stringRedisTemplate));
+        filterMap.put("jwt", new JwtFilter());
         factoryBean.setFilters(filterMap);
         //设置接口过滤规则
         LinkedHashMap<String, String> filterChainDefinitionMap = new LinkedHashMap<>(16);

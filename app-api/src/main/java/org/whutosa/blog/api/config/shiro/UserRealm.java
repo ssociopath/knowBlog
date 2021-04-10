@@ -1,6 +1,5 @@
 package org.whutosa.blog.api.config.shiro;
 
-import com.auth0.jwt.exceptions.TokenExpiredException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;

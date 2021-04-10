@@ -1,15 +1,10 @@
 package org.whutosa.blog.api.controller;
 
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.ShiroException;
-import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.subject.Subject;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.whutosa.blog.api.vo.UserVO;
@@ -17,6 +12,7 @@ import org.whutosa.blog.common.response.ApplicationResponse;
 import org.whutosa.blog.common.response.SystemCodeEnum;
 import org.whutosa.blog.common.utils.misc.Constant;
 import org.whutosa.blog.common.utils.misc.JwtUtil;
+import org.whutosa.blog.data.config.redis.RedisUtil;
 import org.whutosa.blog.data.dto.valid.UserEditValidGroup;
 import org.whutosa.blog.data.dto.valid.UserLoginValidGroup;
 import org.whutosa.blog.data.entity.User;
@@ -39,8 +35,6 @@ import java.util.stream.Collectors;
 public class UserController {
     @Resource
     UserService userService;
-    @Resource
-    StringRedisTemplate stringRedisTemplate;
 
     @GetMapping
     @RequiresPermissions(logical = Logical.AND, value = {"user:view"})
@@ -78,8 +72,8 @@ public class UserController {
         }
 
         String currentTimeMillis = String.valueOf(System.currentTimeMillis());
-        stringRedisTemplate.opsForValue().set(Constant.REDIS_REFRESH_TOKEN + user.getAccount(), currentTimeMillis,
-                Long.parseLong(Constant.REFRESH_TOKEN_EXPIRE_TIME), TimeUnit.SECONDS);
+        RedisUtil.setObject(Constant.REDIS_REFRESH_TOKEN + user.getAccount(), currentTimeMillis,
+                Long.parseLong(Constant.REFRESH_TOKEN_EXPIRE_TIME));
         String token = JwtUtil.sign(user.getAccount(), currentTimeMillis);
         httpServletResponse.setHeader("Authorization", token);
         httpServletResponse.setHeader("Access-Control-Expose-Headers", "Authorization");
@@ -93,8 +87,8 @@ public class UserController {
             return ApplicationResponse.fail(SystemCodeEnum.ARGUMENT_WRONG, "用户不存在！");
         }
         String key = Constant.REDIS_REFRESH_TOKEN + user.getAccount();
-        if(Boolean.TRUE.equals(stringRedisTemplate.hasKey(key))){
-            stringRedisTemplate.delete(key);
+        if(RedisUtil.hasKey(key)){
+            RedisUtil.deleteKey(key);
         }
         return ApplicationResponse.succeed();
     }

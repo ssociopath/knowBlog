@@ -6,21 +6,14 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.whutosa.blog.common.response.SystemCodeEnum;
 import org.whutosa.blog.common.utils.misc.Constant;
 import org.whutosa.blog.common.utils.misc.JwtUtil;
+import org.whutosa.blog.data.config.redis.RedisUtil;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-
 /**
  * @author bobo
  * @date 2021/4/7
@@ -28,11 +21,6 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class JwtFilter extends BasicHttpAuthenticationFilter {
-    private StringRedisTemplate redisTemplate;
-
-    public JwtFilter(StringRedisTemplate redisTemplate) {
-        this.redisTemplate = redisTemplate;
-    }
 
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
@@ -110,18 +98,17 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
         String token = getAuthzHeader(request);
         // 获取当前Token的帐号信息
         String account = JwtUtil.getClaim(token, "account");
+        String key = Constant.REDIS_REFRESH_TOKEN + account;
         // 判断Redis中RefreshToken是否存在
-        if (Boolean.TRUE.equals(redisTemplate.hasKey(Constant.REDIS_REFRESH_TOKEN + account))) {
+        if (RedisUtil.hasKey(key)) {
             // Redis中RefreshToken还存在，获取RefreshToken的时间戳
-            String currentTimeMillisRedis = Objects.requireNonNull(redisTemplate.opsForValue()
-                    .get(Constant.REDIS_REFRESH_TOKEN + account)).toString();
+            String currentTimeMillisRedis = RedisUtil.getObject(key).toString();
             // 获取当前AccessToken中的时间戳，与RefreshToken的时间戳对比，如果当前时间戳一致，进行AccessToken刷新
             if (JwtUtil.getClaim(token, JwtUtil.CURRENT_TIME_MILLIS).equals(currentTimeMillisRedis)) {
                 // 获取当前最新时间戳
                 String currentTimeMillis = String.valueOf(System.currentTimeMillis());
                 // 设置RefreshToken中的时间戳为当前最新时间戳，且刷新过期时间重新为30分钟过期(配置文件可配置refreshTokenExpireTime属性)
-                redisTemplate.opsForValue().set(Constant.REDIS_REFRESH_TOKEN + account, currentTimeMillis,
-                        Long.parseLong(Constant.REFRESH_TOKEN_EXPIRE_TIME), TimeUnit.SECONDS);
+                RedisUtil.setObject(key, currentTimeMillis, Long.parseLong(Constant.REFRESH_TOKEN_EXPIRE_TIME));
                 // 刷新AccessToken，设置时间戳为当前最新时间戳
                 token = JwtUtil.sign(account, currentTimeMillis);
                 // 将新刷新的AccessToken再次进行Shiro的登录
