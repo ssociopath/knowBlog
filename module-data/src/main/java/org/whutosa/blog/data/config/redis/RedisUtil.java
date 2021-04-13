@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -18,8 +19,8 @@ public class RedisUtil {
 
     private static RedisTemplate<String, Object> redisTemplate;
 
-    @Autowired
-    public static void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
+    @Resource
+    public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
         RedisUtil.redisTemplate = redisTemplate;
     }
 
