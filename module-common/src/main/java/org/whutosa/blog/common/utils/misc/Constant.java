@@ -26,4 +26,9 @@ public class Constant {
      * JWT认证加密私钥(Base64加密)
      */
     public static final String ENCRYPT_JWT_KEY = "U0JBUElKV1RkV2FuZzkyNjQ1NA==";
+
+    /**
+     * 密码位数
+     */
+    public static final Integer PASSWORD_MAX_LEN = 8;
 }

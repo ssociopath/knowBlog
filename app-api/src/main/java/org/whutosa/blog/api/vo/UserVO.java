@@ -26,12 +26,16 @@ public class UserVO {
     private Integer id;
     private String account;
     private String username;
+    private String userFace;
+    private String dateRegister;
 
     public static UserVO fromUser(User user) {
         return UserVO.builder()
                 .id(user.getId())
                 .account(user.getAccount())
                 .username(user.getUsername())
+                .userFace(user.getUserFace())
+                .dateRegister(user.getDateRegister())
                 .build();
     }
 }
