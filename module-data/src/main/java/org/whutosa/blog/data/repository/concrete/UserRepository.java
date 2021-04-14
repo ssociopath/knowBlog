@@ -1,6 +1,5 @@
 package org.whutosa.blog.data.repository.concrete;
 
-import org.springframework.stereotype.Repository;
 import org.whutosa.blog.data.entity.User;
 import org.whutosa.blog.data.repository.DataRepository;
 

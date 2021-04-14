@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.codec.Base64;
 import org.springframework.stereotype.Component;
@@ -86,5 +87,11 @@ public class JwtUtil {
             throw new ApplicationException(SystemCodeEnum.SERVER_INNER_ERROR,
                     "解密Token中的公共信息出现JWTDecodeException异常:" + e.getMessage());
         }
+    }
+
+    public static String getCurrentClaim(String claim){
+        String token = SecurityUtils.getSubject().getPrincipal().toString();
+        // 解密获得Account
+        return getClaim(token, claim);
     }
 }

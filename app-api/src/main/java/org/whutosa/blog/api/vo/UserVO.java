@@ -4,14 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.whutosa.blog.data.dto.valid.UserEditValidGroup;
-import org.whutosa.blog.data.dto.valid.UserLoginValidGroup;
 import org.whutosa.blog.data.entity.User;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
 
 /**
  * @author bobo

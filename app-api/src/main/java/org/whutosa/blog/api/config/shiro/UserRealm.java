@@ -77,7 +77,7 @@ public class UserRealm extends AuthorizingRealm {
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
         String token = (String) authenticationToken.getCredentials();
         // 解密获得account，用于和数据库进行对比
-        String account = JwtUtil.getClaim(token, "account");
+        String account = JwtUtil.getClaim(token, JwtUtil.ACCOUNT);
         // 帐号为空
         if (StringUtil.isBlank(account)) {
             throw new AuthenticationException("Token中帐号为空(The account in Token is empty.)");

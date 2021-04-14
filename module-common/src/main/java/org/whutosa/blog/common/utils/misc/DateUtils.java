@@ -1,7 +1,5 @@
 package org.whutosa.blog.common.utils.misc;
 
-import org.apache.shiro.authc.UsernamePasswordToken;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 

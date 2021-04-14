@@ -1,8 +1,8 @@
 package org.whutosa.blog.data.entity;
 
 import lombok.*;
-import org.whutosa.blog.data.dto.valid.UserEditValidGroup;
-import org.whutosa.blog.data.dto.valid.UserLoginValidGroup;
+import org.whutosa.blog.data.bo.valid.UserEditValidGroup;
+import org.whutosa.blog.data.bo.valid.UserLoginValidGroup;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

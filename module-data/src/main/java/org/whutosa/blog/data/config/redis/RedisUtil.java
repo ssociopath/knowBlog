@@ -1,12 +1,15 @@
 package org.whutosa.blog.data.config.redis;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * @author bobo
@@ -44,6 +47,26 @@ public class RedisUtil {
             log.info(e.getMessage());
         }
         return false;
+    }
+
+    public static boolean setObject(String key, Object value, Long time, TimeUnit timeUnit){
+        try{
+            if(time>0){
+                redisTemplate.opsForValue().set(key,value, time, timeUnit);
+                return true;
+            }
+        }catch (Exception e){
+            log.info(e.getMessage());
+        }
+        return false;
+    }
+
+    public static void scanValue(String pattern, Consumer<byte[]> consumer){
+        redisTemplate.execute((RedisConnection connection) -> {
+            Cursor<byte[]> cursor = connection.scan(ScanOptions.scanOptions().match(pattern).count(1000).build());
+            cursor.forEachRemaining(consumer);
+            return null;
+        });
     }
 
     public static boolean hasKey(String key){

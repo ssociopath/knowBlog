@@ -1,6 +1,5 @@
 package org.whutosa.blog.data.repository.concrete;
 
-import org.whutosa.blog.data.entity.Permission;
 import org.whutosa.blog.data.entity.RolePermission;
 import org.whutosa.blog.data.repository.DataRepository;
 
@@ -12,7 +11,10 @@ import java.util.List;
  */
 
 public interface RolePermissionRepository extends DataRepository<RolePermission, Integer> {
-
-
-    List<RolePermission> findAllByRoleId(Integer id);
+    /**
+     * 通过角色id找到角色权限关系列表
+     * @param roleId 角色id
+     * @return 角色权限关系列表
+     */
+    List<RolePermission> findAllByRoleId(Integer roleId);
 }

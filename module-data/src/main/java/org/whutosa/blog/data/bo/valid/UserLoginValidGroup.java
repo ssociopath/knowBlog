@@ -1,4 +1,4 @@
-package org.whutosa.blog.data.dto.valid;
+package org.whutosa.blog.data.bo.valid;
 
 /**
  * 用户登录校验分组

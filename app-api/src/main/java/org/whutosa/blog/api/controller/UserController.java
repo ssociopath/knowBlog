@@ -1,6 +1,5 @@
 package org.whutosa.blog.api.controller;
 
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -13,8 +12,8 @@ import org.whutosa.blog.common.response.SystemCodeEnum;
 import org.whutosa.blog.common.utils.misc.Constant;
 import org.whutosa.blog.common.utils.misc.JwtUtil;
 import org.whutosa.blog.data.config.redis.RedisUtil;
-import org.whutosa.blog.data.dto.valid.UserEditValidGroup;
-import org.whutosa.blog.data.dto.valid.UserLoginValidGroup;
+import org.whutosa.blog.data.bo.valid.UserEditValidGroup;
+import org.whutosa.blog.data.bo.valid.UserLoginValidGroup;
 import org.whutosa.blog.data.entity.User;
 import org.whutosa.blog.data.service.concrete.UserService;
 
@@ -54,9 +53,7 @@ public class UserController {
     @GetMapping("/info")
     @RequiresAuthentication
     public ApplicationResponse<UserVO> info() {
-        String token = SecurityUtils.getSubject().getPrincipal().toString();
-        // 解密获得Account
-        String account = JwtUtil.getClaim(token, JwtUtil.ACCOUNT);
+        String account = JwtUtil.getCurrentClaim(JwtUtil.ACCOUNT);
         User user = userService.getUserByAccount(account);
         // 用户是否存在
         if (user == null) {
