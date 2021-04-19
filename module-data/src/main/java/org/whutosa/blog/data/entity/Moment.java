@@ -37,11 +37,16 @@ public class Moment {
         this.mdContent = mdContent;
         this.urlList = urlList;
         this.status = status;
-        try {
-            this.publishDate = new Timestamp(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(publishDate).getTime());
-        } catch (ParseException e) {
-            e.printStackTrace();
+        if(publishDate == null){
+            this.publishDate = new Timestamp(System.currentTimeMillis());
+        }else{
+            try {
+                this.publishDate = new Timestamp(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(publishDate).getTime());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
+
     }
 
     public String getPublishDate() {

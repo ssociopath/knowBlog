@@ -2,7 +2,8 @@ package org.whutosa.blog.api.controller;
 
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.web.bind.annotation.*;
-import org.whutosa.blog.api.vo.MomentVO;
+import org.whutosa.blog.api.module.query.MomentQuery;
+import org.whutosa.blog.api.module.vo.MomentVO;
 import org.whutosa.blog.common.exception.ApplicationException;
 import org.whutosa.blog.common.response.ApplicationResponse;
 import org.whutosa.blog.common.response.SystemCodeEnum;
@@ -34,16 +35,14 @@ public class MomentController {
 
     /**
      * 更新或上传微博
-     * @param moment 微博
-     * @param htmlContent 渲染出的html
-     * @param tags 标签
+     * @param momentQuery 微博查询体
      * @return MomentVO
      */
     @PostMapping
     @RequiresAuthentication
-    public ApplicationResponse<MomentVO> save(Moment moment, String htmlContent, String[] tags){
+    public ApplicationResponse<MomentVO> save(MomentQuery momentQuery){
         try {
-            MomentBO momentBO = momentService.saveMoment(moment, htmlContent, tags);
+            MomentBO momentBO = momentService.saveMoment(momentQuery.toMoment(), momentQuery.getHtmlContent(), momentQuery.getTags());
             String key = Constant.MOMENT_CACHE + momentBO.getMoment().getUserId() + ":" + momentBO.getMoment().getId();
             MomentVO momentVO = MomentVO.fromMomentBO(momentBO);
             RedisUtil.setObject(key, momentVO);

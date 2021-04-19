@@ -37,7 +37,6 @@ public class MomentService extends BaseDataService<Moment, Integer> {
         User user = userRepository.findUserByAccount(JwtUtil.getCurrentClaim(JwtUtil.ACCOUNT));
         if(user!=null){
             moment.setUserId(user.getId());
-            moment.setPublishDate(new Timestamp(System.currentTimeMillis()));
             moment = save(moment);
             int momentId = moment.getId();
             List<Tag> tagList = tagService.save(momentId, Arrays.asList(tags));

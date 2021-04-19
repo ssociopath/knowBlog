@@ -5,7 +5,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.whutosa.blog.api.vo.UserVO;
+import org.whutosa.blog.api.module.vo.UserVO;
 import org.whutosa.blog.common.exception.ApplicationException;
 import org.whutosa.blog.common.response.ApplicationResponse;
 import org.whutosa.blog.common.response.SystemCodeEnum;

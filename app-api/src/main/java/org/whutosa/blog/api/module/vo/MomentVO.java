@@ -1,4 +1,4 @@
-package org.whutosa.blog.api.vo;
+package org.whutosa.blog.api.module.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
