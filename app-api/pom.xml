@@ -52,7 +52,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>AppApiApplication</mainClass>
+                    <mainClass>org.whutosa.blog.api.AppApiApplication</mainClass>
                 </configuration>
                 <executions>
                     <execution>

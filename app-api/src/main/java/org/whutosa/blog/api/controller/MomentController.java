@@ -11,7 +11,6 @@ import org.whutosa.blog.common.utils.misc.Constant;
 import org.whutosa.blog.common.utils.misc.JwtUtil;
 import org.whutosa.blog.data.bo.MomentBO;
 import org.whutosa.blog.data.config.redis.RedisUtil;
-import org.whutosa.blog.data.entity.Moment;
 import org.whutosa.blog.data.entity.User;
 import org.whutosa.blog.data.service.concrete.MomentService;
 import org.whutosa.blog.data.service.concrete.UserService;
