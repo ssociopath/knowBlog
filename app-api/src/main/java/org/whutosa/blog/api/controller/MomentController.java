@@ -40,15 +40,12 @@ public class MomentController {
     @PostMapping
     @RequiresAuthentication
     public ApplicationResponse<MomentVO> save(MomentQuery momentQuery){
-        try {
-            MomentBO momentBO = momentService.saveMoment(momentQuery.toMoment(), momentQuery.getHtmlContent(), momentQuery.getTags());
-            String key = Constant.MOMENT_CACHE + momentBO.getMoment().getUserId() + ":" + momentBO.getMoment().getId();
-            MomentVO momentVO = MomentVO.fromMomentBO(momentBO);
-            RedisUtil.setObject(key, momentVO);
-            return ApplicationResponse.succeed(momentVO);
-        } catch (Exception exception) {
-            throw new ApplicationException(SystemCodeEnum.ARGUMENT_WRONG, exception.getMessage());
-        }
+        User user = userService.getUserByAccount(JwtUtil.getCurrentClaim(JwtUtil.ACCOUNT));
+        MomentBO momentBO = momentService.saveMoment(momentQuery.toMoment(), momentQuery.getHtmlContent(), momentQuery.getTags(), user);
+        String key = Constant.MOMENT_CACHE + momentBO.getMoment().getUserId() + ":" + momentBO.getMoment().getId();
+        MomentVO momentVO = MomentVO.fromMomentBO(momentBO);
+        RedisUtil.setObject(key, momentVO);
+        return ApplicationResponse.succeed(momentVO);
     }
 
     /**
@@ -60,12 +57,9 @@ public class MomentController {
     @RequiresAuthentication
     public ApplicationResponse<MomentVO> get(@PathVariable("id") Integer id){
         User user = userService.getUserByAccount(JwtUtil.getCurrentClaim(JwtUtil.ACCOUNT));
-        if (user != null) {
-            String key = Constant.MOMENT_CACHE+user.getId()+":"+id;
-            MomentVO moment = (MomentVO) RedisUtil.getObject(key);
-            return ApplicationResponse.succeed(moment);
-        }
-        return ApplicationResponse.fail(SystemCodeEnum.ARGUMENT_WRONG, "不存在该用户");
+        String key = Constant.MOMENT_CACHE+user.getId()+":"+id;
+        MomentVO moment = (MomentVO) RedisUtil.getObject(key);
+        return ApplicationResponse.succeed(moment);
     }
 
     /**
@@ -76,14 +70,11 @@ public class MomentController {
     @RequiresAuthentication
     public ApplicationResponse<List<MomentVO>> getAll(){
         User user = userService.getUserByAccount(JwtUtil.getCurrentClaim(JwtUtil.ACCOUNT));
-        if (user != null) {
-            List<MomentVO> momentList = new ArrayList<>();
-            RedisUtil.scanValue(Constant.MOMENT_CACHE + user.getId() + ":*", key->{
-                momentList.add((MomentVO) RedisUtil.getObject(new String(key)));
-            });
-            return ApplicationResponse.succeed(momentList);
-        }
-        return ApplicationResponse.fail(SystemCodeEnum.ARGUMENT_WRONG, "不存在该用户");
+        List<MomentVO> momentList = new ArrayList<>();
+        RedisUtil.scanValue(Constant.MOMENT_CACHE + user.getId() + ":*", key->{
+            momentList.add((MomentVO) RedisUtil.getObject(new String(key)));
+        });
+        return ApplicationResponse.succeed(momentList);
     }
 
     /**

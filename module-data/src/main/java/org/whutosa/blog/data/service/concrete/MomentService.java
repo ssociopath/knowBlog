@@ -27,22 +27,16 @@ import java.util.List;
 @Slf4j
 public class MomentService extends BaseDataService<Moment, Integer> {
     @Resource
-    UserRepository userRepository;
-    @Resource
     TagService tagService;
 
     @Transactional(rollbackOn = Exception.class)
-    public MomentBO saveMoment(Moment moment, String htmlContent, String[] tags) throws Exception{
+    public MomentBO saveMoment(Moment moment, String htmlContent, String[] tags, User user){
         //TODO 发布时间，编辑时间区分
-        User user = userRepository.findUserByAccount(JwtUtil.getCurrentClaim(JwtUtil.ACCOUNT));
-        if(user!=null){
-            moment.setUserId(user.getId());
-            moment = save(moment);
-            int momentId = moment.getId();
-            List<Tag> tagList = tagService.save(momentId, Arrays.asList(tags));
-            return MomentBO.fromMomentAndHtmlAndTags(moment, user, htmlContent, tagList);
-        }
-        return null;
+        moment.setUserId(user.getId());
+        moment = save(moment);
+        int momentId = moment.getId();
+        List<Tag> tagList = tagService.save(momentId, Arrays.asList(tags));
+        return MomentBO.fromMomentAndHtmlAndTags(moment, user, htmlContent, tagList);
     }
 
     public void deleteMoment(Integer momentId){
